@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>청소년 SNS & 합리적 소비 퀴즈 챌린지</title>
+    <style>
+        body {
+            font-family: 'Malgun Gothic', sans-serif;
+            background-color: #eef2f7;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .game-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+        h2 { color: #2b7a78; font-size: 20px; margin-bottom: 20px; }
+        .question { font-size: 16px; font-weight: bold; margin-bottom: 20px; line-height: 1.4; text-align: left; }
+        .options button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background-color: #3aafa9;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .options button:hover { background-color: #2b7a78; }
+        #result-screen { display: none; }
+        .score { font-size: 24px; font-weight: bold; color: #17252a; margin: 20px 0; }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <div id="quiz-screen">
+        <h2 id="counter">문제 1 / 4</h2>
+        <div class="question" id="question-text">질문이 여기에 표시됩니다.</div>
+        <div class="options" id="options-container"></div>
+    </div>
+
+    <div id="result-screen">
+        <h2>🎉 퀴즈 완료!</h2>
+        <p>참여해주셔서 감사합니다.</p>
+        <div class="score" id="score-text"></div>
+        <p id="comment" style="color: #666; font-size: 14px;"></p>
+        <button onclick="location.reload()" style="margin-top: 20px; padding: 10px 20px; background: #2b7a78; color: white; border: none; border-radius: 8px; cursor: pointer;">다시 하기</button>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        {
+            q: "1. SNS에서 인플루언서가 특정 제품을 극찬할 때, '뒷광고'인지 의심해 볼 수 있는 올바른 태도는?",
+            options: [
+                "① 좋아요 수가 많으면 무조건 믿고 산다.",
+                "② 본문이나 댓글 구석에 '협찬', '광고' 표기가 숨겨져 있는지 꼼꼼히 본다.",
+                "③ 유명인이 쓰면 성분을 볼 필요가 없다."
+            ],
+            answer: 1
+        },
+        {
+            q: "2. 관심 있던 물건을 검색한 뒤 알고리즘에 계속 광고가 뜰 때, 현명한 대처법으로 거리가 먼 것은?",
+            options: [
+                "① 알고리즘에 이끌려 장바구니 물건을 즉시 결제한다.",
+                "② '정말 지금 나에게 꼭 필요한 물건인지' 한 번 더 생각한다.",
+                "③ 장바구니에 담아둔 뒤 하루 정도 고민해 본다."
+            ],
+            answer: 0
+        },
+        {
+            q: "3. '마감 임박!', '지금 안 사면 품절'처럼 조급함을 유도하여 구매를 만드는 UI 디자인 기법은?",
+            options: [
+                "① 그린 워싱",
+                "② 다크 패턴 (눈속임 상업 설계)",
+                "③ 옴니채널"
+            ],
+            answer: 1
+        },
+        {
+            q: "4. 나와 지구를 모두 살리는 '지속 가능한 소비'를 위해 일상에서 쉽게 실천할 수 있는 행동은?",
+            options: [
+                "① 유행이 바뀔 때마다 옷을 잔뜩 새로 산다.",
+                "② 과대포장이 되었는지, 오래 쓸 수 있는 실용적 제품인지 따져본다.",
+                "③ 고장 나면 수리하기보다 무조건 새것으로 교체한다."
+            ],
+            answer: 1
+        }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+
+    function loadQuiz() {
+        const q = quizData[currentQuestion];
+        document.getElementById("counter").innerText = `문제 ${currentQuestion + 1} / ${quizData.length}`;
+        document.getElementById("question-text").innerText = q.q;
+        
+        const optionsContainer = document.getElementById("options-container");
+        optionsContainer.innerHTML = "";
+        
+        q.options.forEach((opt, index) => {
+            const btn = document.createElement("button");
+            btn.innerText = opt;
+            btn.onclick = () => selectAnswer(index);
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    function selectAnswer(selectedIndex) {
+        if (selectedIndex === quizData[currentQuestion].answer) {
+            score += 25;
+        }
+        
+        currentQuestion++;
+        if (currentQuestion < quizData.length) {
+            loadQuiz();
+        } else {
+            showResult();
+        }
+    }
+
+    function showResult() {
+        document.getElementById("quiz-screen").style.display = "none";
+        document.getElementById("result-screen").style.display = "block";
+        document.getElementById("score-text").innerText = `점수: ${score}점 / 100점`;
+        
+        let msg = "";
+        if (score === 100) {
+            msg = "완벽합니다! 스마트 소비와 다크 패턴을 완벽히 이해하셨네요!";
+        } else if (score >= 50) {
+            msg = "좋습니다! 조금만 더 비판적인 눈으로 SNS 광고를 바라봐요.";
+        } else {
+            msg = "알고리즘의 상술에 속지 않도록 현명한 소비 습관을 길러봐요!";
+        }
+        document.getElementById("comment").innerText = msg;
+    }
+
+    loadQuiz();
+</script>
+
+</body>
+</html>
